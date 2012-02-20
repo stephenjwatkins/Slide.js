@@ -1,0 +1,16 @@
+html, body {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	background: #f9f9f9;
+	font: 14px/1.6 "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+	color: #777;
+}
+
+h1 {
+	font-size: 2em;
+	margin: 20px 0 10px 0;
+	text-align: center;
+}

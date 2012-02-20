@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Basic :: Slide.js</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" href="css/style.css" />
+		<style>
+			#slideshow {
+				background: #222;
+				margin: 0 auto;
+				text-align: center;
+				width: 720px;
+				height: 405px;
+			}
+			#slideshow img {
+				border: 0 solid red;
+			}
+			#controls {
+				margin-top: 10px;
+				text-align: center;
+			}
+			#controls a {
+				color: black;
+				margin-left: 20px;
+			}
+			#controls a:first-child {
+				margin-left: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Basic Slide.js Example</h1>
+		<div id="slideshow"></div>
+		<div id="controls">
+			<a href="#" id="previous">Previous</a>
+			<a href="#" id="next">Next</a>
+		</div>
+		<script src="../src/Class.js" type="text/javascript"></script>
+		<script src="../src/Slide.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			var target = document.getElementById('slideshow');
+			var slideShow = new Slide.Show(target);
+			slideShow.addItems([
+				"img/Chrysanthemum.jpg",
+				"img/Desert.jpg",
+				"img/Hydrangeas.jpg",
+				"img/Jellyfish.jpg",
+				"img/Koala.jpg",
+				"img/Lighthouse.jpg"
+			]);
+
+			slideShow.initialize();
+
+			var previous = document.getElementById('previous');
+			var next = document.getElementById('next');
+
+			Slide.Util.addEventListener(previous, 'click', function() {
+				slideShow.previous();
+				return false;
+			});
+
+			Slide.Util.addEventListener(next, 'click', function() {
+				slideShow.next();
+				return false;
+			});
+		</script>
+	</body>
+</html>
