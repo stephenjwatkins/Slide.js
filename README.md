@@ -45,7 +45,7 @@ Currently, Slide.js only supports images. Items can be added at any time during 
 
 ### Render the slideshow
 
-It's important to render the slideshow after constructing the slideshow. This gives the developer flexibility in adding images and performing other manipulations before displaying the slideshow.
+Rendering the slideshow will display it in the target element. Rendering the slideshow _after_ constructing it gives the developer flexibility in adding images and performing other manipulations before displaying the slideshow.
 
 	slideShow.render();
 

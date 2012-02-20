@@ -93,15 +93,15 @@ Slide.Show = Class.extend({
 Slide.Item = Class.extend({
 
 	init: function(_src) {
-		var SLIDEITEM = this;
+		var SLIDE_ITEM = this;
 
 		this.src = _src;
 		this.isLoaded = false;
 
 		this.el = new Image();
 		this.el.onload = function() {
-			SLIDEITEM.isLoaded = true;
-			SLIDEITEM.el.style.removeProperty('display');
+			SLIDE_ITEM.isLoaded = true;
+			SLIDE_ITEM.el.style.removeProperty('display');
 		};
 		this.el.src = _src;
 		this.el.style.display = 'none';
