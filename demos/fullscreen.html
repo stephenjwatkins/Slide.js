@@ -69,8 +69,7 @@
 				<div class="clear"></div>
 			</div>
 		</div>
-		<script src="../src/Class.js" type="text/javascript"></script>
-		<script src="../src/Slide.js" type="text/javascript"></script>
+		<script src="../Slide.js" type="text/javascript"></script>
 		<script type="text/javascript">
 			var target = document.getElementById('slideshow');
 			var slideShow = new Slide.Show(target);
@@ -83,7 +82,7 @@
 				"img/Lighthouse.jpg"
 			]);
 
-			slideShow.initialize();
+			slideShow.render();
 
 			var previous = document.getElementById('previous');
 			var next = document.getElementById('next');

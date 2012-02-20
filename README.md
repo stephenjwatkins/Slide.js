@@ -11,12 +11,29 @@ __Slide.js does not require jQuery.__
 
 ## Using Slide.js
 
+### Include Slide.js
+
+	<script src="Slide.js" type="text/javascript"></script>
+
+### Create Slideshow element
+
+This can be any element. All slideshow items will be appended to this element.
+
+	<div id="slideshow"></div>
+
+### Construct a new slideshow
+
+	// Grab the target element
 	var target = document.getElementById('slideshow');
 
-	// Construct a new slideshow, giving it the element to place the slideshow in when initialized.
+	// Construct a new slideshow, giving it the target element.
+	// The target element is where the slideshow will be placed when rendered.
 	var slideShow = new Slide.Show(target);
 
-	// Add items to the slideshow. These can be added at any time and changes will be seen immediately.
+### Add items
+
+Currently, Slide.js only supports images. Items can be added at any time during the phase of the slideshow.
+
 	slideShow.addItems([
 		"img/Chrysanthemum.jpg",
 		"img/Desert.jpg",
@@ -26,20 +43,23 @@ __Slide.js does not require jQuery.__
 		"img/Lighthouse.jpg"
 	]);
 
-	// Initialize the slideshow. This method will actually render the slideshow, displaying the first image.
-	// On purpose, there is a separation for constructing and rendering the slideshow.
-	slideShow.initialize();
+### Render the slideshow
 
-	// Hooks for previous/next slideshow items
+It's important to render the slideshow after constructing the slideshow. This gives the developer flexibility in adding images and performing other manipulations before displaying the slideshow.
+
+	slideShow.render();
+
+### Slideshow hooks
+
+Hook into Slide.js methods to control the slideshow. Currently, Slide.js supports previous and next.
+
 	var previous = document.getElementById('previous');
 	var next = document.getElementById('next');
 
 	Slide.Util.addEventListener(previous, 'click', function() {
 		slideShow.previous();
-		return false;
 	});
 
 	Slide.Util.addEventListener(next, 'click', function() {
 		slideShow.next();
-		return false;
 	});
