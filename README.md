@@ -26,7 +26,8 @@ __Slide.js does not require jQuery.__
 		"img/Lighthouse.jpg"
 	]);
 
-	// Initialize the slideshow. This method will actually render the slideshow, displaying the first image. Puposely, there is a separation for constructing and rendering the slideshow.
+	// Initialize the slideshow. This method will actually render the slideshow, displaying the first image.
+	// On purpose, there is a separation for constructing and rendering the slideshow.
 	slideShow.initialize();
 
 	// Hooks for previous/next slideshow items
