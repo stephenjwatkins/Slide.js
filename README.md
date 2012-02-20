@@ -7,6 +7,8 @@ Slide.js is a simple, lightweight slideshow written in JavaScript. It's focus is
 
 Slide.js will support image and video format.
 
+*Slide.js does not require jQuery.*
+
 ## Using Slide.js
 
 	var target = document.getElementById('slideshow');
