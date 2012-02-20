@@ -13,7 +13,7 @@ __Slide.js does not require jQuery.__
 
 	var target = document.getElementById('slideshow');
 
-	// Construct the new slideshow, giving it the element to place the slideshow in when constructed.
+	// Construct a new slideshow, giving it the element to place the slideshow in when initialized.
 	var slideShow = new Slide.Show(target);
 
 	// Add items to the slideshow. These can be added at any time and changes will be seen immediately.
@@ -26,8 +26,7 @@ __Slide.js does not require jQuery.__
 		"img/Lighthouse.jpg"
 	]);
 
-	// Initialize the slideshow. This will actually construct it. Useful separation for constructing
-	// and rendering a slideshow.
+	// Initialize the slideshow. This method will actually render the slideshow, displaying the first image. Puposely, there is a separation for constructing and rendering the slideshow.
 	slideShow.initialize();
 
 	// Hooks for previous/next slideshow items
