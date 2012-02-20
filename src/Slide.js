@@ -192,25 +192,3 @@ Slide.Util = {
 	}
 
 };
-
-function executeOnLoad(node, func) {
-	if (isInDOMTree(node)) {
-		func(node);
-	} else {
-		setTimeout(function() {
-			executeOnLoad(node, func);
-		}, 100);
-	}
-}
-
-function isInDOMTree(node) {
-	return !!(findUltimateAncestor(node).body);
-}
-
-function findUltimateAncestor(node) {
-	var ancestor = node;
-	while (ancestor.parentNode) {
-		ancestor = ancestor.parentNode;
-	}
-	return ancestor;
-}
