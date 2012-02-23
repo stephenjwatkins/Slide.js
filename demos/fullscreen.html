@@ -11,6 +11,8 @@
 			}
 			#slideshow {
 				background: #222;
+				margin: 0;
+				padding: 0;
 				position: absolute;
 				top: 0;
 				left: 0;
@@ -72,29 +74,30 @@
 		<script src="../Slide.js" type="text/javascript"></script>
 		<script type="text/javascript">
 			var target = document.getElementById('slideshow');
+
 			var slideShow = new Slide.Show(target);
+
 			slideShow.addItems([
-				"img/Chrysanthemum.jpg",
-				"img/Desert.jpg",
-				"img/Hydrangeas.jpg",
-				"img/Jellyfish.jpg",
-				"img/Koala.jpg",
-				"img/Lighthouse.jpg"
+				new Slide.Image("img/Chrysanthemum.jpg"),
+				new Slide.Image("img/Desert.jpg"),
+				new Slide.HTML('<div>Yeah, HTML!</div>'),
+				new Slide.Image("img/Jellyfish.jpg"),
+				new Slide.Image("img/Koala.jpg"),
+				new Slide.Image("img/Lighthouse.jpg")
 			]);
 
-			slideShow.render();
+			slideShow.start();
+			slideShow.to(4);
 
 			var previous = document.getElementById('previous');
 			var next = document.getElementById('next');
 
 			Slide.Util.addEventListener(previous, 'click', function() {
 				slideShow.previous();
-				return false;
 			});
 
 			Slide.Util.addEventListener(next, 'click', function() {
 				slideShow.next();
-				return false;
 			});
 		</script>
 	</body>

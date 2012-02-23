@@ -41,9 +41,7 @@ var Slide = {};
 Slide.Show = Class.extend({
 
 	init: function(_target, _options) {
-		this.options = Slide.Util.mergeObjects({
-			'start': 0
-		}, _options);
+		this.options = {};
 
 		this.target = _target;
 		this.items = [];
@@ -56,18 +54,48 @@ Slide.Show = Class.extend({
 	},
 
 	addItem: function(_item) {
-		this.items.push(new Slide.Item(_item));
+		this.items.push(_item);
 	},
 
 	addItems: function(_items) {
 		for (var i = 0; i < _items.length; i++) {
-			this.items.push(new Slide.Item(_items[i]));
+			this.addItem(_items[i]);
 		}
 	},
 
-	render: function() {
-		this.current = this.options['start'];
+	start: function(_start) {
+		var start = _start || 1;
+		this.current = (start - 1);
 		this.items[this.current].attach(this.target);
+	},
+
+	stop: function() {
+		this.items[this.current].detach(this.target);
+	},
+
+	play: function() {
+		var SLIDE_SHOW = this;
+		this.playInterval = setInterval(function() {
+			SLIDE_SHOW.next();
+		}, 2000);
+	},
+
+	pause: function() {
+		clearInterval(this.playInterval);
+	},
+
+	to: function(_slide) {
+		this.items[this.current].detach(this.target);
+		this.current = _slide - 1;
+		this.items[this.current].attach(this.target);
+	},
+
+	first: function() {
+		this.to(1);
+	},
+
+	last: function() {
+		this.to(this.items.length);
 	},
 
 	next: function() {
@@ -92,38 +120,66 @@ Slide.Show = Class.extend({
 
 Slide.Item = Class.extend({
 
-	init: function(_src) {
-		var SLIDE_ITEM = this;
-
-		this.src = _src;
-		this.isLoaded = false;
-
-		this.el = new Image();
-		this.el.onload = function() {
-			SLIDE_ITEM.isLoaded = true;
-			SLIDE_ITEM.el.style.removeProperty('display');
-		};
-		this.el.src = _src;
-		this.el.style.display = 'none';
+	init: function(_el) {
+		this.el = _el || {};
+		this._loading = false;
+		this._detached = true;
 	},
 
 	attach: function(target) {
-		var SLIDE_ITEM = this;
-		if (!this.isLoaded) {
+		this._detached = false;
+		this._attach(target);
+	},
+
+	_attach: function(target) {
+		if (this._detached) {
+			return;
+		} else if (this._loading) {
+			var SLIDE_ITEM = this;
 			setTimeout(function() {
-				SLIDE_ITEM.attach(target);
+				SLIDE_ITEM._attach(target);
 			}, 50);
 		} else {
-			target.appendChild(this.el);
+			if (Slide.Util.isElement(this.el)) {
+				target.appendChild(this.el);
+			} else if (typeof this.el === 'string') {
+				target.innerHTML = this.el;
+			} else {
+				target.innerHTML = '';
+			}
 			this.invalidate(target);
 		}
 	},
 
 	detach: function(target) {
-		target.removeChild(this.el);
+		this._detached = true;
+		target.innerHTML = '';
+	},
+
+	invalidate: function() { }
+
+});
+
+Slide.Image = Slide.Item.extend({
+
+	init: function(_src) {
+		this._super();
+
+		this._loading = true;
+
+		var SLIDE_ITEM = this;
+		this.el = new Image();
+		this.el.onload = function() {
+			SLIDE_ITEM._loading = false;
+			SLIDE_ITEM.el.style.display = '';
+		};
+		this.el.src = _src;
+		this.el.style.display = 'none';
 	},
 
 	invalidate: function(target) {
+		this._super(target);
+
 		var size = Slide.Util.constrain(
 						this.el.offsetWidth,
 						this.el.offsetHeight,
@@ -135,6 +191,8 @@ Slide.Item = Class.extend({
 	}
 
 });
+
+Slide.HTML = Slide.Item;
 
 Slide.Util = {
 
@@ -163,6 +221,20 @@ Slide.Util = {
 		} else {
 			el['on' + ev] = fn;
 		}
+	},
+
+	isNode: function(o){
+		return (
+			typeof Node === "object" ? o instanceof Node :
+				o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName==="string"
+		);
+	},
+
+	isElement: function(o){
+		return (
+			typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
+			o && typeof o === "object" && o.nodeType === 1 && typeof o.nodeName==="string"
+		);
 	},
 
 	getStyle: function(el,styleProp) {
@@ -230,4 +302,3 @@ Slide.Util = {
 	}
 
 };
-

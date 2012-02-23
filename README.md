@@ -3,11 +3,12 @@
 
 _Important: This project has just started. It is a work in progress, to say the least._
 
-Slide.js is a JavaScript slideshow library. It has three main goals:
+Slide.js is a JavaScript slideshow library. It has a few goals:
 
 - Simple & Lightweight
 - Presentation Agnostic
 - jQuery Independent
+- CSS Independent
 
 Slide.js is a simple, lightweight slideshow written in JavaScript. It's focus is on the behavior of the slideshow, not the presentation. This will result in a powerful API for developers/designers to simply and quickly plug into any existing application. At the same time, leaving them with the flexibility of how they want to present the slideshow.
 
