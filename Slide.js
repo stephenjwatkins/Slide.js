@@ -38,133 +38,198 @@ Class.extend = function(prop) {
 
 var Slide = {};
 
-Slide.Show = Class.extend({
+Slide.EventAware = Class.extend({
+	init: function() {
+		this.handlers = {};
+	},
+	on: function(event, func) {
+		this.handlers[event] = this.handlers[event] || [];
+		this.handlers[event].push(func);
+	},
+	off: function(event, func) {
+		if (typeof func === 'undefined') {
+			this.handlers[event] = [];
+		} else {
+			for (var i = 0; i < this.handlers[event].length; i++) {
+				if (this.handlers[event][i] == func) {
+					this.handlers[event].splice(i, 1);
+					break;
+				}
+			}
+		}
+	},
+	hasHandler: function(event) {
+		return this.handlers[event].length > 0;
+	},
+	fire: function(event, _args) {
+		var args = _args || [];
+		for (var i = 0; i < this.handlers[event].length; i++) {
+			this.handlers[event][i].apply(this, args);
+		}
+	}
+});
 
+Slide.Show = Slide.EventAware.extend({
 	init: function(_target, _options) {
-		this.options = {};
+
+		this.options = Slide.Util.mergeObjects({
+				'playbackSpeed': 5000
+			}, _options);
 
 		this.target = _target;
 		this.items = [];
 		this.current = -1;
+		this.handlers = {
+			'previous': [],
+			'next': [],
+			'start': [],
+			'stop': [],
+			'play': [],
+			'pause': [],
+			'to': [],
+			'addItem': [],
+			'preattach': [],
+			'postattach': [],
+			'predetach': [],
+			'postdetach': []
+		};
 
 		var SLIDE = this;
 		Slide.Util.addEventListener(window, 'resize', function() {
-			SLIDE.items[SLIDE.current].invalidate(SLIDE.target);
+			if (SLIDE.current > -1) {
+				SLIDE.items[SLIDE.current].invalidate();
+			}
 		});
 	},
-
 	addItem: function(_item) {
 		this.items.push(_item);
+		_item.index = this.items.length - 1;
+		_item.slideshow = this;
+		this.fire('addItem', [_item]);
 	},
-
 	addItems: function(_items) {
 		for (var i = 0; i < _items.length; i++) {
 			this.addItem(_items[i]);
 		}
 	},
-
 	start: function(_start) {
 		var start = _start || 1;
 		this.current = (start - 1);
-		this.items[this.current].attach(this.target);
+		this.items[this.current].attach();
+		this.fire('start');
 	},
-
 	stop: function() {
-		this.items[this.current].detach(this.target);
+		this.items[this.current].detach();
+		this.fire('stop');
 	},
-
 	play: function() {
 		var SLIDE_SHOW = this;
 		this.playInterval = setInterval(function() {
 			SLIDE_SHOW.next();
-		}, 2000);
+		}, this.options['playbackSpeed']);
+		this.fire('play');
 	},
-
 	pause: function() {
 		clearInterval(this.playInterval);
+		this.fire('pause');
 	},
-
 	to: function(_slide) {
-		this.items[this.current].detach(this.target);
-		this.current = _slide - 1;
-		this.items[this.current].attach(this.target);
+		var SLIDE_SHOW = this;
+		this.items[this.current].detach(function() {
+			SLIDE_SHOW.current = ((_slide - 1) >= SLIDE_SHOW.items.length) ? 0 : (((_slide - 1) < 0) ? (SLIDE_SHOW.items.length - 1) : (_slide - 1));
+			SLIDE_SHOW.items[SLIDE_SHOW.current].attach();
+			SLIDE_SHOW.fire('to', [SLIDE_SHOW._currentObject()]);
+		});
 	},
-
 	first: function() {
 		this.to(1);
+		this.fire('first', [this._currentObject()]);
 	},
-
 	last: function() {
 		this.to(this.items.length);
+		this.fire('last', [this._currentObject()]);
 	},
-
 	next: function() {
-		this.items[this.current].detach(this.target);
-		this.current++;
-		if (this.current == this.items.length) {
-			this.current = 0;
-		}
-		this.items[this.current].attach(this.target);
+		this.to(this.current + 2);
+		this.fire('next', [this._currentObject()]);
 	},
-
 	previous: function() {
-		this.items[this.current].detach(this.target);
-		this.current--;
-		if (this.current == -1) {
-			this.current = (this.items.length - 1);
-		}
-		this.items[this.current].attach(this.target);
+		this.to(this.current);
+		this.fire('previous', [this._currentObject()]);
+	},
+	_currentObject: function() {
+		return {
+			index: this.current,
+			item: this.items[this.current]
+		};
 	}
-
 });
 
-Slide.Item = Class.extend({
-
+Slide.Item = Slide.EventAware.extend({
 	init: function(_el) {
 		this.el = _el || {};
+		this.slideshow = {};
+		this.index = -1;
+		this.handlers = {
+			'load': [],
+			'invalidate': []
+		};
 		this._loading = false;
 		this._detached = true;
+		this._detaching = false;
 	},
-
-	attach: function(target) {
+	attach: function(func) {
 		this._detached = false;
-		this._attach(target);
+		this.slideshow.fire('preattach', [this, {
+			'func': this._attach,
+			'param': func
+		}]);
+		if (!this.slideshow.hasHandler('preattach')) {
+			this._attach(func);
+		}
 	},
-
-	_attach: function(target) {
+	_attach: function(func) {
 		if (this._detached) {
 			return;
 		} else if (this._loading) {
 			var SLIDE_ITEM = this;
 			setTimeout(function() {
-				SLIDE_ITEM._attach(target);
+				SLIDE_ITEM._attach();
 			}, 50);
 		} else {
 			if (Slide.Util.isElement(this.el)) {
-				target.appendChild(this.el);
+				this.slideshow.target.appendChild(this.el);
 			} else if (typeof this.el === 'string') {
-				target.innerHTML = this.el;
+				this.slideshow.target.innerHTML = this.el;
 			} else {
-				target.innerHTML = '';
+				this.slideshow.target.innerHTML = '';
 			}
-			this.invalidate(target);
+			this.invalidate();
+		}
+		this.slideshow.fire('postattach', [this]);
+		if (func) func.call(this);
+	},
+	detach: function(func) {
+		this._detached = true;
+		this.slideshow.fire('predetach', [this, {
+			'func': this._detach,
+			'param': func
+		}]);
+		if (!this.slideshow.hasHandler('predetach')) {
+			this._detach(func);
 		}
 	},
-
-	detach: function(target) {
-		this._detached = true;
-		target.innerHTML = '';
+	_detach: function(func) {
+		this.slideshow.target.innerHTML = '';
+		this.slideshow.fire('postdetach', [this]);
+		if (func) func.call(this);
 	},
-
 	invalidate: function() { }
-
 });
 
 Slide.Image = Slide.Item.extend({
-
 	init: function(_src) {
 		this._super();
-
 		this._loading = true;
 
 		var SLIDE_ITEM = this;
@@ -172,30 +237,30 @@ Slide.Image = Slide.Item.extend({
 		this.el.onload = function() {
 			SLIDE_ITEM._loading = false;
 			SLIDE_ITEM.el.style.display = '';
+			SLIDE_ITEM.fire('load', SLIDE_ITEM);
 		};
 		this.el.src = _src;
 		this.el.style.display = 'none';
 	},
-
-	invalidate: function(target) {
-		this._super(target);
+	invalidate: function() {
+		this._super();
 
 		var size = Slide.Util.constrain(
 						this.el.offsetWidth,
 						this.el.offsetHeight,
-						target.offsetWidth,
-						target.offsetHeight);
+						this.slideshow.target.offsetWidth,
+						this.slideshow.target.offsetHeight);
 
 		this.el.style.width = size.width + 'px';
 		this.el.style.height = size.height + 'px';
-	}
 
+		this.fire('invalidate', this);
+	}
 });
 
-Slide.HTML = Slide.Item;
+Slide.HTML = Slide.Item,
 
 Slide.Util = {
-
 	mergeObjects: function(obj1, obj2) {
 		if (typeof obj1 == 'undefined') {
 			return {};
@@ -212,7 +277,6 @@ Slide.Util = {
 		}
 		return obj3;
 	},
-
 	addEventListener: function(el, ev, fn) {
 		if (el.addEventListener) {
 			el.addEventListener(ev, fn, false);
@@ -222,21 +286,18 @@ Slide.Util = {
 			el['on' + ev] = fn;
 		}
 	},
-
 	isNode: function(o){
 		return (
 			typeof Node === "object" ? o instanceof Node :
 				o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName==="string"
 		);
 	},
-
 	isElement: function(o){
 		return (
 			typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
 			o && typeof o === "object" && o.nodeType === 1 && typeof o.nodeName==="string"
 		);
 	},
-
 	getStyle: function(el,styleProp) {
 		var x = document.getElementById(el);
 		var y = {};
@@ -247,7 +308,6 @@ Slide.Util = {
 		}
 		return y;
 	},
-
 	constrain: function (currentWidth, currentHeight, maxWidth, maxHeight) {
 		if (!maxWidth && !maxHeight) {
 			return {
@@ -259,40 +319,34 @@ Slide.Util = {
 		var widthRatio = heightRatio = 1.0;
 		var didWidth = didHeight = false;
 
-		if ( maxWidth > 0 && currentWidth > 0) {// && $current_width > $max_width ) {
+		if ( maxWidth > 0 && currentWidth > 0) {
 			widthRatio = maxWidth / currentWidth;
 			didWidth = true;
 		}
 
-		if ( maxHeight > 0 && currentHeight > 0) {// && $current_height > $max_height ) {
+		if ( maxHeight > 0 && currentHeight > 0) {
 			heightRatio = maxHeight / currentHeight;
 			didHeight = true;
 		}
 
-		// Calculate the larger/smaller ratios
 		var smallerRatio = Math.min( widthRatio, heightRatio );
 		var largerRatio  = Math.max( widthRatio, heightRatio );
 
 		var ratio = 1.0;
 		if ((currentWidth * largerRatio) > maxWidth || (currentHeight * largerRatio) > maxHeight) {
-			// The larger ratio is too big. It would result in an overflow.
 			ratio = smallerRatio;
 		} else {
-			// The larger ratio fits, and is likely to be a more "snug" fit.
 			ratio = largerRatio;
 		}
 
 		var w = currentWidth * ratio;
 		var h = currentHeight * ratio;
 
-		// Sometimes, due to rounding, we'll end up with a result like this: 465x700 in a 177x177 box is 117x176... a pixel short
-		// We also have issues with recursive calls resulting in an ever-changing result. Constraining to the result of a constraint should yield the original result.
-		// Thus we look for dimensions that are one pixel shy of the max value and bump them up
 		if (didWidth && (w == maxWidth - 1)) {
-			w = maxWidth; // Round it up
+			w = maxWidth;
 		}
 		if (didHeight && (h == maxHeight - 1)) {
-			h = maxHeight; // Round it up
+			h = maxHeight;
 		}
 
 		return {
@@ -300,5 +354,4 @@ Slide.Util = {
 			'height': h
 		};
 	}
-
 };

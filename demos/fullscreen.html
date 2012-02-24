@@ -66,8 +66,8 @@
 		<div id="slideshow"></div>
 		<div id="controls">
 			<div class="container">
-				<a href="#" id="previous">Previous</a>
-				<a href="#" id="next">Next</a>
+				<a href="#" id="previous" onClick="return false;">Previous</a>
+				<a href="#" id="next" onClick="return false;">Next</a>
 				<div class="clear"></div>
 			</div>
 		</div>
@@ -75,7 +75,60 @@
 		<script type="text/javascript">
 			var target = document.getElementById('slideshow');
 
-			var slideShow = new Slide.Show(target);
+			var slideShow = new Slide.Show(target, {
+				playbackSpeed: 4000 // Milliseconds
+			});
+
+			slideShow.on('start', function() {
+				if (console) console.log('Slideshow starting! Shhhh.');
+			});
+
+			slideShow.on('previous', function(obj) {
+				if (console) console.log('Previous image [' + obj.index + ', ' + obj + ']');
+			});
+
+			slideShow.on('next', function(obj) {
+				if (console) console.log('Next image [' + obj.index + ', ' + obj + ']');
+			});
+
+			slideShow.on('addItem', function(obj) {
+				if (console) console.log('Item added to slideshow [' + obj.index + ', ' + obj + ']');
+			});
+
+			slideShow.on('postattach', function(obj) {
+				if (console) console.log('After attaching [' + obj.index + ', ' + obj + ']');
+				if (Slide.Util.isElement(obj.el)) {
+					var i = 0;
+					fadeIn();
+					function fadeIn() {
+						if (i < 1) {
+							obj.el.style.opacity = i;
+							i += .04;
+							setTimeout(fadeIn, 10);
+						}
+					}
+				}
+			});
+
+			slideShow.on('predetach', function(obj, detach) {
+				if (console) console.log('Before detaching [' + obj.index + ', ' + obj + ']');
+				if (Slide.Util.isElement(obj.el)) {
+					var i = 1;
+					fadeOut();
+					function fadeOut() {
+						if (i > 0) {
+							obj.el.style.opacity = i;
+							i -= .04;
+							setTimeout(fadeOut, 10);
+						} else {
+							if (console) console.log('Calling detach in handler [' + obj.index + ', ' + obj + ']');
+							detach.func.call(obj, detach.param);
+						}
+					}
+				} else {
+					detach.func.call(obj, detach.param);
+				}
+			});
 
 			slideShow.addItems([
 				new Slide.Image("img/Chrysanthemum.jpg"),
@@ -88,6 +141,7 @@
 
 			slideShow.start();
 			slideShow.to(4);
+			slideShow.play();
 
 			var previous = document.getElementById('previous');
 			var next = document.getElementById('next');
