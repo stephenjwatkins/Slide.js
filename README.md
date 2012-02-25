@@ -94,7 +94,7 @@ Slide.js has a very powerful, flexible API that gives the developer full control
 
 ### Usage
 
-Slide.js allows for a number of slideshow hooks to enable custom functionality at certain slideshow events. To add _any_ hook, use the following code.
+Slide.js allows for a number of slideshow hooks to enable custom functionality for slideshow events. To add _any_ hook, use the following code.
 
 	slideShow.on('hook', function(event) {
 		// Execute custom code on hook
@@ -132,7 +132,7 @@ The following hooks are transitional, meaning that they are intermediate steps f
 	postattach   // Called after a slide is attached
 	postdetach   // Called after a slide is detached
 
-Synchronous hooks are passed the following event object.
+Synchronous (preattachment/predetachment) hooks are passed the following event object.
 
 	event.item   // Actual slide object in the slideshow
 
@@ -155,10 +155,10 @@ To operate properly, the preattachment/predetachment hooks are asynchronous. The
 	preattach   // Called before a slide is attached
 	predetach   // Called before a slide is detached
 
-Synchronous hooks are passed the following event object.
+Asynchronous (postattachment/postdetachment) hooks are passed the following event object.
 
 	event.item               // Actual slide object in the slideshow
-	event[.attach | detach]  // Method to actually call attach/detach
+	event.[attach | detach]  // Method to actually call attach/detach
 
 ## Styling the Slideshow
 
