@@ -11,8 +11,7 @@ Slide.js is a media-centric slideshow, not a presentation tool. It's focused on 
 - Extensive API
 - Keyboard Navigation
 - jQuery Independent
-- Presentation Agnostic
-- No CSS Required
+- Presentation Agnostic / No CSS Required
 
 ## Getting Started
 
