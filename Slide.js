@@ -100,6 +100,9 @@
 			};
 		},
 		addItem: function(_item) {
+			Slide.Util.isArray(_item) ? this._addItems(_item) : this._addItem(_item);
+		},
+		_addItem: function(_item) {
 			this.items.push(_item);
 			_item.index = this.items.length - 1;
 			_item.slideshow = this;
@@ -108,7 +111,7 @@
 				item: _item
 			});
 		},
-		addItems: function(_items) {
+		_addItems: function(_items) {
 			for (var i = 0; i < _items.length; i++) {
 				this.addItem(_items[i]);
 			}

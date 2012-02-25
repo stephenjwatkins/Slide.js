@@ -40,7 +40,7 @@ This can be any element. All slideshow items will be directly attached to this e
 
 Slide.js supports images and HTML. Items can be added to the slideshow at any time.
 
-	slideShow.addItems([
+	slideShow.addItem([
 		new Slide.Image("img/Chrysanthemum.jpg"),
 		new Slide.Image("img/Desert.jpg"),
 		new Slide.Image("img/Hydrangeas.jpg"),
@@ -77,19 +77,18 @@ Starting the show will attach the first item to the show.
 
 ## API
 
-Slide.js has a very powerful, flexible API giving the developer full control.
+Slide.js has a very powerful, flexible API that gives the developer full control.
 
-	slideShow.addItem(item);       // Add an item to the slideshow
-	slideShow.addItems(itemArray); // Add array of items to the slideshow
-	slideShow.start(slideNumber);  // Start the slideshow. Optionally, specify a starting slide number (1 - slide count)
-	slideShow.stop();              // Stop the slideshow. Detaches any slide items
-	slideShow.play();              // Play the slideshow. This will cycle through the items
-	slideShow.pause();             // Pause the slideshow
-	slideShow.to(slideNumber);     // Go to specificied slide number
-	slideShow.first();             // Go to first slide
-	slideShow.last();              // Go to last slide
-	slideShow.next();              // Go to next slide
-	slideShow.previous();          // Go to previous slide
+	slideShow.addItem(item | itemArray);  // Add an item or array of items to the slideshow
+	slideShow.start(slideNumber);         // Start the slideshow. Optionally, specify a starting slide number (1 - slide count)
+	slideShow.stop();                     // Stop the slideshow. Detaches any slide items
+	slideShow.play();                     // Play the slideshow. This will cycle through the items
+	slideShow.pause();                    // Pause the slideshow
+	slideShow.to(slideNumber);            // Go to specificied slide number
+	slideShow.first();                    // Go to first slide
+	slideShow.last();                     // Go to last slide
+	slideShow.next();                     // Go to next slide
+	slideShow.previous();                 // Go to previous slide
 
 ## Hooks
 
