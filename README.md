@@ -82,11 +82,12 @@ Slide.js has a very powerful, flexible API that gives the developer full control
 	slideShow.stop();                     // Stop the slideshow. Detaches any slide items
 	slideShow.play();                     // Play the slideshow. This will cycle through the items
 	slideShow.pause();                    // Pause the slideshow
+	slideShow.togglePlay();               // If the slideshow is playing, pause it. Otherwise, play it
 	slideShow.to(slideNumber);            // Go to specificied slide number
 	slideShow.first();                    // Go to first slide
 	slideShow.last();                     // Go to last slide
 	slideShow.next();                     // Go to next slide
-	slideShow.previous();                 // Go to previous slide
+	slideShow.prev();                     // Go to previous slide
 
 ## Hooks
 

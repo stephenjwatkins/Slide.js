@@ -160,7 +160,7 @@
 			var first = document.getElementById('first');
 			var last = document.getElementById('last');
 			Slide.Util.addEventListener(previous, 'click', function() {
-				slideShow.previous();
+				slideShow.prev();
 			});
 			Slide.Util.addEventListener(next, 'click', function() {
 				slideShow.next();
@@ -172,11 +172,7 @@
 				slideShow.last();
 			});
 			Slide.Util.addEventListener(playPause, 'click', function() {
-				if (slideShow.playing) {
-					slideShow.pause();
-				} else {
-					slideShow.play();
-				}
+				slideShow.togglePlay();
 			});
 		</script>
 	</body>

@@ -82,8 +82,9 @@
 			this.items = [];
 			this.current = -1;
 			this.playing = false;
+			this.started = false;
 			this.handlers = {
-				'previous': [],
+				'prev': [],
 				'next': [],
 				'first': [],
 				'last': [],
@@ -98,6 +99,9 @@
 				'predetach': [],
 				'postdetach': []
 			};
+
+			Slide.Util.addEventListener(window, 'resize', Slide.Util.bind(this._onWindowResize, this));
+			Slide.Util.addEventListener(document, 'keydown', Slide.Util.bind(this._onKeyDown, this));
 		},
 		addItem: function(_item) {
 			Slide.Util.isArray(_item) ? this._addItems(_item) : this._addItem(_item);
@@ -117,19 +121,25 @@
 			}
 		},
 		start: function(_start) {
+			if (this.started) return;
+
+			this.started = true;
 			var start = _start || 1;
 			this.current = (start - 1);
 			this.items[this.current].attach();
-			Slide.Util.addEventListener(window, 'resize', Slide.Util.bind(this._onWindowResize, this));
-			Slide.Util.addEventListener(document, 'keydown', Slide.Util.bind(this._onKeyDown, this));
 
 			this.fire('start');
 		},
 		stop: function() {
-			this.items[this.current].detach();
-			Slide.Util.removeEventListener(window, 'resize', Slide.Util.bind(this._onWindowResize, this));
-			Slide.Util.removeEventListener(document, 'keydown', Slide.Util.bind(this._onKeyDown, this));
+			if (!this.started) return;
 
+			if (this.playing) {
+				clearInterval(this.playInterval);
+				this.playing = false;
+			}
+			this.items[this.current].detach();
+
+			this.started = false;
 			this.fire('stop');
 		},
 		play: function() {
@@ -159,6 +169,13 @@
 				this.playing = false;
 				clearInterval(this.playInterval);
 				this.fire('pause');
+			}
+		},
+		togglePlay: function() {
+			if (this.playing) {
+				this.pause();
+			} else {
+				this.play();
 			}
 		},
 		to: function(_slide) {
@@ -197,11 +214,11 @@
 		_next: function() {
 			this._to(this.current + 2);
 		},
-		previous: function() {
+		prev: function() {
 			this.to(this.current);
-			this.fire('previous', this._currentObject());
+			this.fire('prev', this._currentObject());
 		},
-		_previous: function() {
+		_prev: function() {
 			this._to(this.current);
 		},
 		_currentObject: function() {
@@ -226,6 +243,9 @@
 				keyCode = event.which;
 			}
 			switch (keyCode) {
+				case 27:
+					this.stop();
+					break;
 				case 32:
 					(this.playing) ? this.pause() : this.play();
 					break;
@@ -233,7 +253,7 @@
 					this.next();
 					break;
 				case 37:
-					this.previous();
+					this.prev();
 					break;
 			}
 		}
