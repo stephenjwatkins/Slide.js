@@ -178,11 +178,11 @@
 				this.play();
 			}
 		},
-		to: function(_slide) {
+		to: function(_slide, func) {
 			this._resetPlay();
-			this._to(_slide);
+			this._to(_slide, func);
 		},
-		_to: function(_slide) {
+		_to: function(_slide, func) {
 			var SHOW = this;
 			this.items[this.current].detach(function() {
 				var tempCur = _slide - 1;
@@ -199,6 +199,10 @@
 					SHOW.pause();
 				}
 				SHOW.fire('to', SHOW._currentObject());
+
+				if (func) {
+					func.call(this);
+				}
 			});
 		},
 		first: function() {
@@ -208,15 +212,19 @@
 			this.to(this.items.length);
 		},
 		next: function() {
-			this.to(this.current + 2);
-			this.fire('next', this._currentObject());
+			var SHOW = this;
+			this.to(this.current + 2, function() {
+				this.fire('next', SHOW._currentObject());
+			});
 		},
 		_next: function() {
 			this._to(this.current + 2);
 		},
 		prev: function() {
-			this.to(this.current);
-			this.fire('prev', this._currentObject());
+			var SHOW = this;
+			this.to(this.current, function() {
+				this.fire('prev', SHOW._currentObject());
+			});
 		},
 		_prev: function() {
 			this._to(this.current);
