@@ -214,7 +214,7 @@
 		next: function() {
 			var SHOW = this;
 			this.to(this.current + 2, function() {
-				this.fire('next', SHOW._currentObject());
+				SHOW.fire('next', SHOW._currentObject());
 			});
 		},
 		_next: function() {
@@ -223,7 +223,7 @@
 		prev: function() {
 			var SHOW = this;
 			this.to(this.current, function() {
-				this.fire('prev', SHOW._currentObject());
+				SHOW.fire('prev', SHOW._currentObject());
 			});
 		},
 		_prev: function() {
