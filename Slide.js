@@ -130,17 +130,20 @@
 
 			this.fire('start');
 		},
-		stop: function() {
+		stop: function(cb) {
 			if (!this.started) return;
 
 			if (this.playing) {
 				clearInterval(this.playInterval);
 				this.playing = false;
 			}
-			this.items[this.current].detach();
 
-			this.started = false;
-			this.fire('stop');
+			var SHOW = this;
+			this.items[this.current].detach(function() {
+				cb.call(null);
+				SHOW.started = false;
+				SHOW.fire('stop');
+			});
 		},
 		play: function() {
 			if (!this.playing) {
@@ -236,8 +239,10 @@
 			};
 		},
 		_onWindowResize: function() {
-			if (this.current > -1 && this.current < this.items.length) {
-				this.items[this.current].invalidate();
+			if (this.started && this.current > -1 && this.current < this.items.length) {
+				if (this.items[this.current]._loading === false) {
+					this.items[this.current].invalidate();
+				}
 			}
 		},
 		_onKeyDown: function(_event) {
@@ -315,11 +320,11 @@
 				}
 				this.slideshow.target.appendChild(this.el);
 				this.invalidate();
+				this.slideshow.fire('postattach', {
+					item: this
+				});
+				if (cb) cb.call(null);
 			}
-			this.slideshow.fire('postattach', {
-				item: this
-			});
-			if (cb) cb.call(null);
 		},
 		detach: function(cb) {
 			var SLIDE_ITEM = this;
